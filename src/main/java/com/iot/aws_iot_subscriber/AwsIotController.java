@@ -3,12 +3,17 @@ package com.iot.aws_iot_subscriber;
 import com.amazonaws.services.iot.client.AWSIotException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
 @RequestMapping("/api/iot")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AwsIotController {
     private final AwsIotService awsIotService;
 
@@ -26,7 +31,7 @@ public class AwsIotController {
 
     @GetMapping("/data")
     @ResponseStatus(HttpStatus.OK)
-    public String getData(
+    public ResponseEntity<?> getData(
             @RequestParam(value = "filter", required = false) String filter,
             @RequestHeader("X-API-KEY") String apiKey
     ) throws AWSIotException {
@@ -36,9 +41,14 @@ public class AwsIotController {
         }
 
         initiateService();
+
         if (filter != null) {
-            return filter + ": " + awsIotService.getLatestFilterValue(filter);
+            String value = awsIotService.getLatestFilterValue(filter);
+            return ResponseEntity.ok(Map.of(filter, value));
         }
-        return awsIotService.getLatestMessagePayload();
+
+        return ResponseEntity.ok(awsIotService.getLatestMessagePayload());
     }
+
+
 }

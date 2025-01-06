@@ -7,6 +7,8 @@ import com.iot.aws_iot_subscriber.websocket.MessageStorageService;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class AwsIotService {
 
@@ -31,22 +33,23 @@ public class AwsIotService {
         connected = true;
     }
 
-    public String getLatestMessagePayload() {
+    public Map<String, Object> getLatestMessagePayload() {
         String payload = messageStorageService.getLatestMessage();
         if (payload == null) {
-            return "Waiting for data..." + "\n" + "Please reload the page...";
+            return Map.of("message", "Waiting for data. Please reload the page...");
         }
-        return messageStorageService.getLatestMessage();
+        JSONObject jsonObject = new JSONObject(payload);
+        return jsonObject.toMap();
     }
 
-    public double getLatestFilterValue(String key) {
+    public String getLatestFilterValue(String key) {
         String jsonString = messageStorageService.getLatestMessage();
+        System.out.println(jsonString);
         if (jsonString == null || jsonString.isEmpty()) {
             throw new IllegalStateException("No messages available in the queue");
         }
         JSONObject jsonObject = new JSONObject(jsonString);
-        return jsonObject.getDouble(key);
-
+        return jsonObject.getString(key);
     }
 
     public boolean isConnected() {
