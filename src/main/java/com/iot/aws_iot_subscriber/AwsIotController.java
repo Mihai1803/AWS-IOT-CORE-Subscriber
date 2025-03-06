@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/iot")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AwsIotController {
     private final AwsIotService awsIotService;
 
